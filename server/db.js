@@ -5,7 +5,7 @@ const pool = new Pool({
     password: "abcdef",
     host: "localhost",
     port: 5432,
-    database: "jwttutorial"
+    database: "authhabits"
 });
 
 module.exports = pool;
