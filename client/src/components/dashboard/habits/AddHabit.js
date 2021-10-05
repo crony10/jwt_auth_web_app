@@ -1,7 +1,7 @@
 import React, { Fragment, useState } from "react";
 
 
-const AddHabit = ({ habit_name }) => {
+const AddHabit = ({ habit_name,setHabitsChange }) => {
     // console.log("aave che?");
 
     const [habit_duration, setDuration] = useState(0);
@@ -17,7 +17,16 @@ const AddHabit = ({ habit_name }) => {
             myHeaders.append("Content-Type","application/json");
             myHeaders.append("token",localStorage.token);
 
-            const body = { habit_name, habit_duration, habit_reward };
+            const name = habit_name;
+            const duration  = habit_duration;
+            const reward = habit_reward;
+
+            if(reward.length===0){
+                alert("Don't hold your self back!Add some reward for yourself.")
+            }
+
+            const body = { name, reward, duration };
+            console.log(body);
             const response = await fetch("http://localhost:5000/dashboard/habits/", 
             {
                 method: "POST",
@@ -29,6 +38,8 @@ const AddHabit = ({ habit_name }) => {
             console.log(parseRes);
             // console.log(response);
             // window.location = "/";
+            setHabitsChange(true);
+            // setHabit("");
         } catch (err) {
             console.log(err.message);
         }
@@ -53,6 +64,7 @@ const AddHabit = ({ habit_name }) => {
                                     <label htmlFor="Duration">🔥Duration(In days)</label>
                                     <input type="number"
                                         id="Duration"
+                                        placeholder="0"
                                         onChange={element => setDuration(element.target.value)}
                                     />
                                 </div>
@@ -70,7 +82,7 @@ const AddHabit = ({ habit_name }) => {
                         </div>
 
                         <div class="modal-footer">
-                            <button
+                            <button data-dismiss="modal"
                                 type="button"
                                 class="btn btn-success"
                                 onClick={() => add(habit_name)}>Add</button>

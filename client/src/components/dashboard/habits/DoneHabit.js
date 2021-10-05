@@ -1,7 +1,7 @@
 import React, { Fragment, useState, useRef } from "react";
 
 
-const DoneHabit = ({ habit }) => {
+const DoneHabit = ({ habit,setHabitsChange }) => {
     let yesRef = useRef();
     const [habit_id, setHabit_id] = useState(habit.habit_id);
 
@@ -13,20 +13,32 @@ const DoneHabit = ({ habit }) => {
             if (habit.habit_streak !== habit.habit_duration) {
                 habit_streak += 1;
             }
+            else if(habit.habit_sreak > habit.habit_duration){
+                alert("Congratulation now you can claim your reward of: " + habit.habit_reward);
+                return;
+            }
             else {
                 alert("Congratulation now you can claim your reward of: " + habit.habit_reward);
                 return;
             }
 
-            const body = { habit_streak };
+            const streak = habit_streak;
+            const body = { streak };
+            console.log(body);
 
-            const res = await fetch(`http://localhost:5000/habits/increaseStreak/${id}`, {
+            const myHeaders = new Headers();
+
+            myHeaders.append("Content-type","application/json");
+            myHeaders.append("token",localStorage.token);            
+
+            const res = await fetch(`http://localhost:5000/dashboard/habits/increaseStreak/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers:myHeaders,
                 body: JSON.stringify(body)
             });
             // console.log(res);
-            window.location = "/";
+            // window.location = "/";
+            setHabitsChange(true);
         } catch (err) {
             console.errror(err.message)
         }
@@ -42,15 +54,22 @@ const DoneHabit = ({ habit }) => {
                 return;
             }
 
-            const body = { habit_streak };
+            const streak = habit_streak;
+            const body = { streak };
 
-            const res = await fetch(`http://localhost:5000/habits/increaseStreak/${id}`, {
+            const myHeaders = new Headers();
+
+            myHeaders.append("Content-type","application/json");
+            myHeaders.append("token",localStorage.token);
+
+            const res = await fetch(`http://localhost:5000/dashboard/habits/decreaseStreak/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: myHeaders,
                 body: JSON.stringify(body)
             });
-            // console.log(res);
-            window.location = "/";
+            console.log(res);
+            // window.location = "/";
+            setHabitsChange(true);
         } catch (err) {
             console.errror(err.message)
         }
@@ -83,6 +102,7 @@ const DoneHabit = ({ habit }) => {
                                 <div >
                                     <button type="button"
                                         className="btn btn-success"
+                                        data-dismiss="modal"
                                         class="btn btn-outline-primary mr-1"
                                         ref={yesRef}
                                         onClick={() => { increaseStreak(habit.habit_id, habit.habit_streak) }}>
@@ -91,6 +111,7 @@ const DoneHabit = ({ habit }) => {
                                 </div>
                                 <div>
                                     <button type="button"
+                                     data-dismiss="modal"
                                         className="btn btn-warning"
                                         class="btn btn-outline-primary ms-1"
                                         onClick={() => { decreaseStreak(habit.habit_id, habit.habit_streak) }}>

@@ -4,30 +4,18 @@ import { CardContent, CardMedia, Typography, CardActionArea, ButtonBase } from "
 import EditHabit from "./EditHabit";
 import { Modal } from 'react-bootstrap';
 import { Button, ButtonToolbar } from 'react-bootstrap';
-import "bootstrap/dist/css/bootstrap.min.css";
-import Overlay from "@restart/ui/esm/Overlay";
+// import "bootstrap/dist/css/bootstrap.min.css";
 import Card from "react-bootstrap/Card";
 import DoneHabit from "./DoneHabit";
 
-const CardListHabit = () => {
-    const [show, setShow] = useState(false);
-
+const CardListHabit = ({allHabits,setHabitsChange}) => {
+    // console.log(allHabits);
 
     const [habits, setHabits] = useState([]);
-    async function getHabits() {
-        try {
-            const response = await fetch("http://localhost:5000/habits");
-
-            const habitArray = await response.json();
-
-            setHabits(habitArray);
-        } catch (err) {
-            console.log(err.message);
-        }
-    }
+    
     useEffect(() => {
-        getHabits();
-    }, []);
+        setHabits(allHabits);
+    }, [allHabits]);
 
     const CardListItem = props => {
         return (
@@ -42,9 +30,9 @@ const CardListHabit = () => {
                             {"🔥" + props.habit.habit_streak}
                             {"🎁" + props.habit.habit_reward}
                         </Card.Text>
-                        <EditHabit habit={props.habit} />
+                        <EditHabit habit={props.habit} setHabitsChange={setHabitsChange} />
 
-                        <DoneHabit  habit={props.habit} />
+                        <DoneHabit  habit={props.habit} setHabitsChange={setHabitsChange} />
 
 
                     </Card.Body>
@@ -54,7 +42,8 @@ const CardListHabit = () => {
     };
     return (
         <ul style={{ listStyleType: "none" }}>
-            {habits.map(habit => {
+            {habits.length !== 0 && habits[0].habit_id !== null &&
+            habits.map(habit => {
                 return <CardListItem habit={habit} key={habit.habit_id} />;
             })}
         </ul>

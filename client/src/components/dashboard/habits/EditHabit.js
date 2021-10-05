@@ -1,6 +1,6 @@
 import React, { Fragment, useState, useRef } from "react";
 
-const EditHabit = ({ habit }) => {
+const EditHabit = ({ habit, setHabitsChange }) => {
     let yesRef = useRef();
 
     const [habit_id, setHabit_id] = useState(habit.habit_id);
@@ -12,15 +12,24 @@ const EditHabit = ({ habit }) => {
     const editText = async (id) => {
 
         try {
-            const body = { habit_name, habit_duration, habit_reward };
+            const name = habit_name;
+            const duration = habit_duration;
+            const reward = habit_reward;
+            const body = { name, duration, reward };
 
-            const res = await fetch(`http://localhost:5000/habits/${id}`, {
+            const myHeaders = new Headers();
+
+            myHeaders.append("Content-type", "application/json");
+            myHeaders.append("token", localStorage.token);
+
+            const res = await fetch(`http://localhost:5000/dashboard/habits/${id}`, {
                 method: "PUT",
-                headers: { "Content-Type": "application/json" },
+                headers: myHeaders,
                 body: JSON.stringify(body)
             });
-            // console.log(res);
-            window.location = "/";
+            // console.log(res); 
+            // window.location = "/";
+            setHabitsChange(true);
         } catch (err) {
             console.errror(err.message)
         }
@@ -28,64 +37,16 @@ const EditHabit = ({ habit }) => {
 
     async function deleteHabit(id) {
         try {
-            const response = await fetch(`http://localhost:5000/habits/${id}`, {
-                method: "DELETE"
-            })
+            const response = await fetch(`http://localhost:5000/dashboard/habits/${id}`, {
+                method: "DELETE",
+                headers: { token: localStorage.token }
+            });
             // console.log(response);
             // setHabits(habits.filter(habit => habit.habit_id !== id))
-            window.location = "/";
+            // window.location = "/";
+            setHabitsChange(true);
         } catch (error) {
             console.log(error.message);
-        }
-    }
-
-    const increaseStreak = async (id, habit_streak) => {
-        try {
-
-            yesRef.current.setAttribute("disabled", "disabled");
-            if (habit.habit_streak !== habit.habit_duration) {
-                habit_streak += 1;
-            }
-            else {
-                alert("Congratulation now you can claim your reward of: " + habit.habit_reward);
-                return;
-            }
-
-            const body = { habit_streak };
-
-            const res = await fetch(`http://localhost:5000/habits/increaseStreak/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body)
-            });
-            // console.log(res);
-            window.location = "/";
-        } catch (err) {
-            console.errror(err.message)
-        }
-    }
-
-    // Function to decrease a streak
-    const decreaseStreak = async (id, habit_streak) => {
-        try {
-            if (habit_streak !== 0)
-                habit_streak -= 1;
-            else {
-                alert("you at least have to complete one day")
-                return;
-            }
-
-            const body = { habit_streak };
-
-            const res = await fetch(`http://localhost:5000/habits/increaseStreak/${id}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body)
-            });
-            // console.log(res);
-            window.location = "/";
-        } catch (err) {
-            console.errror(err.message)
         }
     }
 
@@ -138,6 +99,7 @@ const EditHabit = ({ habit }) => {
                             <div>
                                 <label htmlFor="Reward">❌Delete the habit?</label>
                                 <button
+                                    data-dismiss="modal"
                                     style={{ margin: "10px" }}
                                     onClick={() => deleteHabit(habit_id)}
                                     className="btn btn-danger">

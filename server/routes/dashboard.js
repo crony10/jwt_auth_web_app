@@ -51,7 +51,7 @@ router.put("/habits/:id",authorization, async (req, res) => {
         if(updatedHabit.rows.length===0){
             return res.json("This habit is not yours");
         }
-        res.json("TODO WAS UPDATED");
+        res.json("HABIT WAS UPDATED");
     } catch (err) {
         console.log(err.message)
     }
@@ -71,6 +71,42 @@ router.delete("/habits/:id",authorization, async (req,res) => {
         res.json("habit was deleted");
     } catch (err) {
         console.error(err.message);
+    }
+})
+
+// Increase streak
+router.put("/habits/increaseStreak/:id",authorization,async(req,res)=>{
+    try {
+        const { id } = req.params;
+        const {streak} = req.body;
+        console.log(streak);
+        const increasedHabit = await pool.query(
+            "UPDATE habits SET habit_streak = $1 WHERE habit_id = $2 AND user_id = $3  RETURNING *",[streak,id,req.user.id]
+        );
+        if(increasedHabit.rows.length===0){
+            return res.json("This habit is not yours");
+        }
+        res.json("STREAK WAS INCREASED");
+    } catch (err) {
+        console.log(err.message);
+    }
+})
+
+// Decrease the streak
+router.put("/habits/decreaseStreak/:id",authorization,async(req,res)=>{
+    try {
+        const { id } = req.params;
+        const {streak} = req.body;
+        console.log(streak);
+        const increasedHabit = await pool.query(
+            "UPDATE habits SET habit_streak = $1 WHERE habit_id = $2 AND user_id = $3  RETURNING *",[streak,id,req.user.id]
+        );
+        if(increasedHabit.rows.length===0){
+            return res.json("This habit is not yours");
+        }
+        res.json("STREAK WAS DECREASED");
+    } catch (err) {
+        console.log(err.message);
     }
 })
 
